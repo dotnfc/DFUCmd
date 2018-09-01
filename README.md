@@ -1,5 +1,5 @@
 # DFUCmd
-A usb dfu util based on STMicroelectronics DfuSe v3.0.5
+An usb dfu util based on STMicroelectronics DfuSe v3.0.5
 
 # Note
 > 1. This repo has only one output: DFUCmd.exe (Win32) without any STM official DLLs.

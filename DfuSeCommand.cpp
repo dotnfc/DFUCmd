@@ -112,8 +112,8 @@ bool FileExist(LPCTSTR filename)
 /*******************************************************************************************/
 void man()
 {
-    printf("DfuSe command line v1.18.0901 \n\n");
-    printf("(based on STMicroelectronics DfuSe v3.0.5)\n");
+    printf("DfuSe command line v1.18.0901 \n");
+    printf("(based on STMicroelectronics DfuSe v3.0.5)\n\n");
     printf(" Usage : \n\n");
     printf(" DfuSeCommand.exe [options] [Agrument][[options] [Agrument]...] \n\n");
 
@@ -138,7 +138,7 @@ void man()
     printf("     --o   output_dir  : the target .hex file path to output \n");
 
     printf("\n");
-    printf("  eg: DfuSeCommand.exe -t --i test.hex -c --de 0 -d --fn test.dfu \n");
+    printf("  eg: DfuSeCommand.exe -t test.hex -c --de 0 -d --fn test.dfu \n");
     printf("      DfuSeCommand.exe -t D:\\temp\\ d:\\sample.dfu\n");
     printf("      DfuSeCommand.exe -e --fn D:\\sample.dfu --o c:\\\n\n");
 }
@@ -157,6 +157,7 @@ bool Is_Option(char* option)
     else if (strcmp(option, "-d") == 0) return true;
     else if (strcmp(option, "-t") == 0) return true;
     else if (strcmp(option, "-e") == 0) return true;
+    else if (strcmp(option, "-r") == 0) return true;
     else return false;
 }
 
@@ -427,8 +428,6 @@ void HandleError(PDFUThreadContext pContext)
 
     //AfxMessageBox(CurrentTarget+ErrorCode+Alternate+Operation+TransferSize+LastDFUStatus+CurrentStateMachineTransition+CurrentRequest+StartAddress+EndAddress+CurrentNBlock+CurrentLength+Percent);
     printf(CurrentTarget + ErrorCode + Alternate + Operation + TransferSize + LastDFUStatus + CurrentStateMachineTransition + CurrentRequest + StartAddress + EndAddress + CurrentNBlock + CurrentLength + Percent);
-
-
 }
 
 /*******************************************************************************************/
@@ -690,7 +689,6 @@ int LaunchVerify(void)
         }
         else
         {
-
             return 0;
         }
     }
@@ -713,11 +711,8 @@ int Refresh(void)
     int i;
     char	Product[253];
     CString	Prod, String;
-
     HDEVINFO info;
-
     BOOL bSuccess = FALSE;
-
 
     // Begin with HID devices  // Commented in Version V3.0.3 and Keep it for customer usage if wanted.
     /*ReleaseHIDMemory();
@@ -751,12 +746,9 @@ int Refresh(void)
     for (i = 0; i < 128; i++)
         TmpDev[i] = "";
 
-
-
     info = SetupDiGetClassDevs(&Guid, NULL, NULL, DIGCF_PRESENT | DIGCF_INTERFACEDEVICE);
     if (info != INVALID_HANDLE_VALUE)
     {
-
         SP_INTERFACE_DEVICE_DATA ifData;
         ifData.cbSize = sizeof(ifData);
 
@@ -773,10 +765,7 @@ int Refresh(void)
             if (SetupDiGetDeviceInterfaceDetail(info, &ifData, detail, needed, NULL, &did))
             {
                 // Add the link to the list of all DFU devices
-
-
                 TmpDev[devIndex] = detail->DevicePath;
-
             }
             else
                 TmpDev[devIndex] = "";   //m_CtrlDFUDevices.AddString("");
@@ -786,7 +775,9 @@ int Refresh(void)
                 Prod = Product;
             }
             else
+            {
                 Prod = "(Unnamed DFU device)";
+            }
             // Add the name of the device
             //m_CtrlDevices.AddString(Prod);
             delete[](PBYTE)detail;
@@ -861,8 +852,6 @@ int Refresh(void)
 
 void CALLBACK TimerProc(HWND hWnd, UINT nMsg, UINT nIDEvent, DWORD dwTime)
 {
-
-
     DFUThreadContext Context;
     CString Tmp;
     DWORD dwRet;
@@ -870,14 +859,12 @@ void CALLBACK TimerProc(HWND hWnd, UINT nMsg, UINT nIDEvent, DWORD dwTime)
 
     if (m_OperationCode)
     {
+        CString Tmp, Tmp2;
 
         endTime = CTime::GetCurrentTime();
         elapsedTime = endTime - startTime;
 
         printf(" Duration: %.2i:%.2i:%.2i", elapsedTime.GetHours(), elapsedTime.GetMinutes(), elapsedTime.GetSeconds());
-
-
-        CString Tmp, Tmp2;
 
         // Get the operation status
         STDFUPRT_GetOperationStatus(m_OperationCode, &Context);
@@ -912,20 +899,14 @@ void CALLBACK TimerProc(HWND hWnd, UINT nMsg, UINT nIDEvent, DWORD dwTime)
             // Did we have an error: let's stop all and display the problem
             /*if (Context.Operation==OPERATION_DETACH)
             {
-
-
             }
             else
             {
                 if (Context.Operation==OPERATION_RETURN)
                     m_DetachedDev=""
-
-
             }*/
             //m_CurrentTarget=-1;
             //Refresh();
-
-
 
             // Refresh();
         }
@@ -940,11 +921,7 @@ void CALLBACK TimerProc(HWND hWnd, UINT nMsg, UINT nIDEvent, DWORD dwTime)
 
                 //printf("%i KB(%i Bytes) of %i KB(%i Bytes) \n", ((STDFUFILES_GetImageSize(Context.hImage)/1024)*Context.Percent)/100,  (STDFUFILES_GetImageSize(Context.hImage)*Context.Percent)/100, STDFUFILES_GetImageSize(Context.hImage)/1024,  STDFUFILES_GetImageSize(Context.hImage));
 
-
-
                // m_DataSize.Format("%i KB(%i Bytes) of %i KB(%i Bytes)", ((STDFUFILES_GetImageSize(Context.hImage)/1024)*Context.Percent)/100,  (STDFUFILES_GetImageSize(Context.hImage)*Context.Percent)/100, STDFUFILES_GetImageSize(Context.hImage)/1024,  STDFUFILES_GetImageSize(Context.hImage));
-
-
                 break;
             }
             case OPERATION_UPGRADE:
@@ -953,9 +930,7 @@ void CALLBACK TimerProc(HWND hWnd, UINT nMsg, UINT nIDEvent, DWORD dwTime)
                 printf(Tmp);
 
                 //printf("%i KB(%i Bytes) of %i KB(%i Bytes) \n", ((STDFUFILES_GetImageSize(Context.hImage)/1024)*Context.Percent)/100,  (STDFUFILES_GetImageSize(Context.hImage)*Context.Percent)/100, STDFUFILES_GetImageSize(Context.hImage)/1024,  STDFUFILES_GetImageSize(Context.hImage));
-
                 //m_DataSize.Format("%i KB(%i Bytes) of %i KB(%i Bytes)", ((STDFUFILES_GetImageSize(Context.hImage)/1024)*Context.Percent)/100,  (STDFUFILES_GetImageSize(Context.hImage)*Context.Percent)/100, STDFUFILES_GetImageSize(Context.hImage)/1024,  STDFUFILES_GetImageSize(Context.hImage));
-
 
                 break;
             }
@@ -1236,12 +1211,9 @@ void CALLBACK TimerProc(HWND hWnd, UINT nMsg, UINT nIDEvent, DWORD dwTime)
                             }
                             else
                             {
-
                                 KillTimer(hWnd, nIDEvent);
                                 PostQuitMessage(0);
                             }
-
-
                         }
                         if ((Context.Operation == OPERATION_UPLOAD) &&
                             (m_UpFileName.CompareNoCase(m_DownFileName) == 0))
@@ -1277,21 +1249,19 @@ void CALLBACK TimerProc(HWND hWnd, UINT nMsg, UINT nIDEvent, DWORD dwTime)
 
                         if ((Context.Operation == OPERATION_DETACH) || (Context.Operation == OPERATION_RETURN))
                         {
-
                             /*Refresh();*/
                         }
                         else
                         {
-
                         }
                     }
                     STDFUFILES_DestroyImage(&Context.hImage);
                 }
             }
         }
+
+        fflush(stdout);
     }
-
-
 }
 
 /*******************************************************************************************/
@@ -1426,7 +1396,6 @@ int main_dfu_app(int argc, char* argv[])
     if (argc == 1)  // wrong parameters
     {
         man();
-        //getchar();
     }
     else
     {
@@ -1438,9 +1407,6 @@ int main_dfu_app(int argc, char* argv[])
             {
                 if (arg_index <= (argc - 1))
                     printf("bad parameter [%s] \n", argv[arg_index]);
-
-                printf("\n Press any key to continue ...");
-                getchar();
                 return 1;
             }
 
@@ -1472,12 +1438,10 @@ int main_dfu_app(int argc, char* argv[])
                         if (strcmp(argv[arg_index - 1], "--de") == 0)
                         {
                             m_CurrentDevice = atoi(argv[arg_index]);//0, 1, 2 etc...) \n");
-                            //arg_index--;
                         }
                         else if (strcmp(argv[arg_index - 1], "--al") == 0)
                         {
                             m_CurrentTarget = atoi(argv[arg_index]);//0, 1, 2 etc...) \n");
-                            //arg_index--;
                         }
                     }
                     else
@@ -1486,13 +1450,12 @@ int main_dfu_app(int argc, char* argv[])
                             printf("bad parameter [%s] \n", argv[arg_index]);
 
                         /* TO DO:  Free device and buffers*/
-                        printf("\n Press any key to continue ...");
-                        getchar();
                         return 1;
                     }
                 }
                 // Enumerate the DFU device and Set Buffers
-                Refresh();
+                if (Refresh() != 0)
+                    return 2;
             }
 
             //============================ UPLOAD ===============================================
@@ -1527,9 +1490,6 @@ int main_dfu_app(int argc, char* argv[])
                             printf("bad parameter [%s] \n", argv[arg_index]);
 
                         /* TO DO:  Free device and buffers*/
-
-                        printf("\n Press any key to continue ...");
-                        getchar();
                         return 1;
                     }
                 }
@@ -1544,7 +1504,6 @@ int main_dfu_app(int argc, char* argv[])
                     }
                     else
                     {
-
                         printf("file %s does not exist .. \n", (LPCTSTR)m_UpFileName);
                         return 1;
                     }
@@ -1608,9 +1567,6 @@ int main_dfu_app(int argc, char* argv[])
                             printf("bad parameter [%s] \n", argv[arg_index]);
 
                         /* TO DO:  Free device and buffers*/
-
-                        printf("\n Press any key to continue ...");
-                        getchar();
                         return 1;
                     }
                 }
@@ -1620,9 +1576,6 @@ int main_dfu_app(int argc, char* argv[])
                     printf("file does not exist %s \n", (LPCTSTR)m_DownFileName);
 
                     // TO DO:  Free device and buffers
-
-                    printf("\n Press any key to continue ...");
-                    getchar();
                     return 1;
                 }
 
@@ -1659,6 +1612,8 @@ int main_dfu_app(int argc, char* argv[])
     return 0;
 }
 
+//////////////////////////////////////////////////////////////////////////
+// take from https://github.com/havenxie/winapp-dfuse
 int hex2dfu(int argc, char *argv[], int arg_index)
 {
     while (arg_index < argc)
@@ -1776,8 +1731,6 @@ int hex2dfu(int argc, char *argv[], int arg_index)
             }
             else if (arg_index == argc - 1)
             {
-                printf("\n Press any key to continue ...");
-                //getchar();
                 return 1;
             }
         }
@@ -1823,8 +1776,6 @@ int dfu2hex(int argc, char *argv[], int arg_index)
         {
             if (arg_index <= (argc - 1))
                 printf("bad parameter [%s] \n", argv[arg_index]);
-            printf("\n Press any key to continue ...");
-            getchar();
             return 1;
         }
     }
@@ -1833,8 +1784,6 @@ int dfu2hex(int argc, char *argv[], int arg_index)
     {
         printf("file does not exist %s \n", (LPCTSTR)strDFUFileName);
 
-        printf("\n Press any key to continue ...");
-        getchar();
         return 1;
     }
 
